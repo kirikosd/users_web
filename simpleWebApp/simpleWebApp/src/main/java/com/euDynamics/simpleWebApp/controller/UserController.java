@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Controller
-@RequestMapping("/register")
-public class RegisterController {
+@RequestMapping("/home")
+public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/submit")
+    @PostMapping("/register")
     public @ResponseBody String registerNewUser(@RequestParam String name,
                                                 @RequestParam String surname,
                                                 @RequestParam String gender,
@@ -22,5 +22,11 @@ public class RegisterController {
         User user = new User(name,surname,gender,birthdate,workAddress,homeAddress);
         userRepository.save(user);
         return "Successful Registration!";
+    }
+
+    @GetMapping("/display")
+    public @ResponseBody Iterable<User> getAllUsers() {
+        // This returns a JSON or XML with the users
+        return userRepository.findAll();
     }
 }
