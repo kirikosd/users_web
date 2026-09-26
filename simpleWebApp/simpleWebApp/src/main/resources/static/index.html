@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Management</title>
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        margin: 30px;
+        }
+        button {
+        margin: 5px;
+        padding: 10px 15px;
+        cursor: pointer;
+        }
+
+        .section {
+        margin-top: 20px;
+        display: none;
+        }
+
+        input {
+        padding: 8px;
+        margin: 5px;
+        }
+
+        ul {
+        margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>User Management System</h1>
+
+<div>
+    <button onclick="showRegister()">Register User</button>
+    <button onclick="showUsers()">Display All Users</button>
+</div>
+
+<!-- Register User Section -->
+<div id="registerSection" class="section">
+    <h2>Register User</h2>
+    <input type="text" id="name" placeholder="Enter Name"><br>
+    <input type="text" id="surname" placeholder="Enter Surname"><br>
+
+    <label for="gender">Choose your gender:</label>
+
+    <select name="genders" id="gender">
+        <option value="volvo">Female</option>
+        <option value="saab">Male</option>
+    </select><br>
+
+    <input type="text" id="Birthdate" placeholder="Enter Name"><br>
+    <input type="text" id="workAddress" placeholder="Enter your work address"><br>
+    <input type="text" id="homeAddress" placeholder="Enter your home address"><br>
+    <button onclick="registerUser()">Save</button>
+    <p id="message"></p>
+</div>
+
+<!-- Display Users Section -->
+<div id="usersSection" class="section">
+    <h2>All Users</h2>
+    <ul id="userList"></ul>
+</div>
+
+<script>
+    const users = [];
+
+    function showRegister() {
+    document.getElementById("registerSection").style.display = "block";
+    document.getElementById("usersSection").style.display = "none";
+    }
+
+    function showUsers() {
+    document.getElementById("registerSection").style.display = "none";
+    document.getElementById("usersSection").style.display = "block";
+
+    const userList = document.getElementById("userList");
+    userList.innerHTML = "";
+
+    if (users.length === 0) {
+    userList.innerHTML = "<li>No users registered.</li>";
+    return;
+    }
+
+    users.forEach((user, index) => {
+    const li = document.createElement("li");
+    li.textContent = `${index + 1}. ${user.name} (${user.email})`;
+    userList.appendChild(li);
+    });
+    }
+
+    function registerUser() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    if (!name || !email) {
+    document.getElementById("message").textContent =
+    "Please enter both name and email.";
+    return;
+    }
+
+    users.push({ name, email });
+
+    document.getElementById("message").textContent =
+    "User registered successfully.";
+
+    document.getElementById("name").value = "";
+    document.getElementById("email").value = "";
+    }
+</script>
+
+</body>
+</html>

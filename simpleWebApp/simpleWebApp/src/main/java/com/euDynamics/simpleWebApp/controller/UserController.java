@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Controller
-@RequestMapping("/home")
+@RequestMapping("/homepage")
 public class UserController {
+
     @Autowired
     private UserRepository userRepository;
 
