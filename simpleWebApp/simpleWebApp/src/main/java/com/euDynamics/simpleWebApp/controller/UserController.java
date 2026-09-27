@@ -14,13 +14,7 @@ public class UserController {
     private UserRepository userRepository;
 
     @PostMapping("/register")
-    public @ResponseBody String registerNewUser(@RequestParam String name,
-                                                @RequestParam String surname,
-                                                @RequestParam String gender,
-                                                @RequestParam String birthdate,
-                                                @RequestParam String homeAddress,
-                                                @RequestParam String workAddress){
-        User user = new User(name,surname,gender,birthdate,workAddress,homeAddress);
+    public @ResponseBody String registerNewUser(@RequestBody User user){
         userRepository.save(user);
         return "Successful Registration!";
     }

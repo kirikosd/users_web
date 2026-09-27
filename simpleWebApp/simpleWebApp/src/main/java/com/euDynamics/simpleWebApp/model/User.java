@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 public class User {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private @Nullable Integer id;
 
     private String name;

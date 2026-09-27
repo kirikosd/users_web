@@ -46,13 +46,17 @@
     <label for="gender">Choose your gender:</label>
 
     <select name="genders" id="gender">
-        <option value="volvo">Female</option>
-        <option value="saab">Male</option>
+        <option value="female">Female</option>
+        <option value="male">Male</option>
     </select><br>
 
-    <input type="text" id="Birthdate" placeholder="Enter Name"><br>
-    <input type="text" id="workAddress" placeholder="Enter your work address"><br>
-    <input type="text" id="homeAddress" placeholder="Enter your home address"><br>
+    <input type="text" id="birthdate" placeholder="Enter your date of birth"><br>
+
+    <label for="workAddress">Enter your work address</label><br>
+    <textarea id="workAddress" maxlength="125"></textarea><br>
+
+    <label for="homeAddress">Enter your home address</label><br>
+    <textarea id="homeAddress" maxlength="125"></textarea><br>
     <button onclick="registerUser()">Save</button>
     <p id="message"></p>
 </div>
@@ -72,41 +76,94 @@
     }
 
     function showUsers() {
-    document.getElementById("registerSection").style.display = "none";
-    document.getElementById("usersSection").style.display = "block";
+        document.getElementById("registerSection").style.display = "none";
+        document.getElementById("usersSection").style.display = "block";
 
-    const userList = document.getElementById("userList");
-    userList.innerHTML = "";
+        fetch('/homepage/display')
+            .then(response => response.json())
+            .then(users => {
+                const userList = document.getElementById("userList");
+                userList.innerHTML = "";
 
-    if (users.length === 0) {
-    userList.innerHTML = "<li>No users registered.</li>";
-    return;
-    }
+                if (users.length === 0) {
+                    userList.innerHTML = "<li>No users registered.</li>";
+                    return;
+                }
 
-    users.forEach((user, index) => {
-    const li = document.createElement("li");
-    li.textContent = `${index + 1}. ${user.name} (${user.email})`;
-    userList.appendChild(li);
-    });
+                users.forEach(user => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                        <strong>${user.name} ${user.surname}</strong><br>
+                        Gender: ${user.gender}<br>
+                        Birthdate: ${user.birthdate}<br>
+                        Work Address: ${user.workAddress}<br>
+                        Home Address: ${user.homeAddress}
+                    `;
+                    userList.appendChild(li);
+                });
+            })
+            .catch(err => {
+                document.getElementById("userList").innerHTML = "<li>Error loading users.</li>";
+            });
     }
 
     function registerUser() {
     const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
+    const surname = document.getElementById("surname").value.trim();
+    const gender = document.getElementById("gender").value.trim();
+    const birthdate = document.getElementById("birthdate").value.trim();
+    const workAddress = document.getElementById("workAddress").value.trim();
+    const homeAddress = document.getElementById("homeAddress").value.trim();
 
-    if (!name || !email) {
+    if (!name) {
     document.getElementById("message").textContent =
-    "Please enter both name and email.";
+    "Please enter your name.";
     return;
     }
 
-    users.push({ name, email });
-
+    if (!surname) {
     document.getElementById("message").textContent =
-    "User registered successfully.";
+    "Please enter your surname.";
+    return;
+    }
 
-    document.getElementById("name").value = "";
-    document.getElementById("email").value = "";
+    if (!gender) {
+    document.getElementById("message").textContent =
+    "Please enter your gender";
+    return;
+    }
+
+    if (!birthdate) {
+    document.getElementById("message").textContent =
+    "Please enter your date of birth";
+    return;
+    }
+
+    const user = {name, surname, gender, birthdate, workAddress, homeAddress};
+
+    users.push({ name, surname, gender, birthdate, workAddress, homeAddress });
+
+    fetch('/homepage/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user)
+    })
+    .then(response => {
+        if (response.ok) {
+            document.getElementById("message").textContent = "User registered successfully.";
+            document.getElementById("name").value = "";
+            document.getElementById("surname").value = "";
+            document.getElementById("gender").value = "";
+            document.getElementById("birthdate").value = "";
+            document.getElementById("workAddress").value = "";
+            document.getElementById("homeAddress").value = "";
+        } else {
+            document.getElementById("message").textContent = "Registration failed.";
+        }
+    })
+    .catch(err => {
+        document.getElementById("message").textContent = "Error: " + err.message;
+    });
     }
 </script>
 
