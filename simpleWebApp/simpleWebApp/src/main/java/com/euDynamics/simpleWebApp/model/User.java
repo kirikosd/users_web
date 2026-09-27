@@ -1,24 +1,32 @@
 package com.euDynamics.simpleWebApp.model;
 
-import jakarta.annotation.Nullable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import org.antlr.v4.runtime.misc.NotNull;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name="users")
 public class User {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private @Nullable Integer id;
+    @Column(name="id")
+    private Integer id;
 
+    @Column(name="name")
     private String name;
+
+    @Column(name="surname")
     private String surname;
+
+    @Column(name="gender")
     private String gender;
+
+    @Column(name="birthdate")
     private String birthdate;
+
+    @Column(name="work_address")
     private String workAddress;
+
+    @Column(name="home_address")
     private String homeAddress;
 
     public User(){} //default constructor

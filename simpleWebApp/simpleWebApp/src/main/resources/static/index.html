@@ -1,171 +1,790 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management</title>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
     <style>
+        /* ====== RESET & BASE ====== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-        font-family: Arial, sans-serif;
-        margin: 30px;
-        }
-        button {
-        margin: 5px;
-        padding: 10px 15px;
-        cursor: pointer;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            min-height: 100vh;
         }
 
-        .section {
-        margin-top: 20px;
-        display: none;
+        /* ====== HEADER / NAVBAR ====== */
+        .navbar {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        input {
-        padding: 8px;
-        margin: 5px;
+        .navbar .brand {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
         }
 
-        ul {
-        margin-top: 10px;
+        .navbar .brand span {
+            color: #4fc3f7;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-links button {
+            background: transparent;
+            color: #ccc;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.25s ease;
+        }
+
+        .nav-links button:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .nav-links button.active {
+            background: #4fc3f7;
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        /* ====== MAIN CONTAINER ====== */
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* ====== PAGE VIEWS ====== */
+        .page-view {
+            display: none;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        /* ====== HOMEPAGE ====== */
+        .homepage-hero {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+
+        .homepage-hero h1 {
+            font-size: 2.5rem;
+            color: #1a1a2e;
+            margin-bottom: 0.75rem;
+        }
+
+        .homepage-hero p {
+            font-size: 1.15rem;
+            color: #666;
+            margin-bottom: 2.5rem;
+        }
+
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .action-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border: 2px solid transparent;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            border-color: #4fc3f7;
+        }
+
+        .action-card .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-card h3 {
+            font-size: 1.2rem;
+            color: #1a1a2e;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-card p {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* ====== FORM STYLES ====== */
+        .form-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-card h2 {
+            text-align: center;
+            color: #1a1a2e;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            color: #444;
+            font-size: 0.95rem;
+        }
+
+        .form-group label .required {
+            color: #e53935;
+            margin-left: 2px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+            background: #fafafa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 0 3px rgba(79,195,247,0.2);
+            background: #fff;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group .error-msg {
+            color: #e53935;
+            font-size: 0.82rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .form-group.has-error input,
+        .form-group.has-error select,
+        .form-group.has-error textarea {
+            border-color: #e53935;
+        }
+
+        .form-group.has-error .error-msg {
+            display: block;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.8rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4fc3f7, #0288d1);
+            color: #fff;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #039be5, #01579b);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #555;
+        }
+
+        .btn-secondary:hover {
+            background: #ccc;
+        }
+
+        .btn-danger {
+            background: #e53935;
+            color: #fff;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-danger:hover {
+            background: #c62828;
+        }
+
+        /* Success toast */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #43a047;
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-weight: 600;
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.4s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: #e53935;
+        }
+
+        /* ====== DISPLAY USERS ====== */
+        .display-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .display-header h2 {
+            color: #1a1a2e;
+            font-size: 1.5rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-box input {
+            padding: 0.5rem 0.9rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            width: 220px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #4fc3f7;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .user-table thead {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+        }
+
+        .user-table th {
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-table td {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
+        .user-table tbody tr {
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .user-table tbody tr:hover {
+            background: #e3f2fd;
+        }
+
+        .user-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .user-table .name-cell {
+            font-weight: 600;
+            color: #0288d1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* ====== USER DETAIL MODAL ====== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal h3 {
+            color: #1a1a2e;
+            margin-bottom: 1.25rem;
+            font-size: 1.3rem;
+            padding-right: 2rem;
+        }
+
+        .modal .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .modal .close-btn:hover {
+            color: #333;
+        }
+
+        .detail-row {
+            display: flex;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 140px;
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .detail-section {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .detail-section h4 {
+            color: #0288d1;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+            text-align: center;
+        }
+
+        /* ====== CONFIRM DIALOG ====== */
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .confirm-overlay.active {
+            display: flex;
+        }
+
+        .confirm-dialog {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .confirm-dialog h3 {
+            margin-bottom: 0.75rem;
+            color: #1a1a2e;
+        }
+
+        .confirm-dialog p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .confirm-dialog .confirm-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .confirm-dialog .btn {
+            flex: 1;
+        }
+
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 0 1rem;
+            }
+
+            .nav-links button {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .homepage-hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-card {
+                padding: 1.5rem;
+            }
+
+            .user-table th,
+            .user-table td {
+                padding: 0.7rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .display-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
-<h1>User Management System</h1>
+<!-- ====== NAVBAR ====== -->
+<nav class="navbar">
+    <div class="brand" onclick="App.navigate('home')">
+        User<span>Manager</span>
+    </div>
+    <div class="nav-links">
+        <button data-page="home" class="active">🏠 Home</button>
+        <button data-page="register">➕ Register User</button>
+        <button data-page="display">👥 Display Users</button>
+    </div>
+</nav>
 
-<div>
-    <button onclick="showRegister()">Register User</button>
-    <button onclick="showUsers()">Display All Users</button>
+<!-- ====== TOAST ====== -->
+<div id="toast" class="toast"></div>
+
+<!-- ====== MAIN CONTENT ====== -->
+<div class="container">
+
+    <!-- ====== HOMEPAGE VIEW ====== -->
+    <div id="view-home" class="page-view active">
+        <div class="homepage-hero">
+            <h1>Welcome to User Manager</h1>
+            <p>Register new users or browse the existing user database.</p>
+            <div class="action-cards">
+                <div class="action-card" data-page="display" onclick="App.navigate('display')">
+                    <div class="card-icon">👥</div>
+                    <h3>Display Users</h3>
+                    <p>Browse, search, and view detailed information about registered users.</p>
+                </div>
+                <div class="action-card" data-page="register" onclick="App.navigate('register')">
+                    <div class="card-icon">➕</div>
+                    <h3>Register New User</h3>
+                    <p>Fill in the form below to add a new user to the system.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== REGISTER VIEW ====== -->
+    <div id="view-register" class="page-view">
+        <div class="form-card">
+            <h2>Register New User</h2>
+            <form id="userForm" novalidate>
+                <!-- Name -->
+                <div class="form-group" id="grp-name">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <input type="text" id="name" placeholder="Enter first name">
+                    <div class="error-msg">Name is required.</div>
+                </div>
+
+                <!-- Surname -->
+                <div class="form-group" id="grp-surname">
+                    <label for="surname">Surname <span class="required">*</span></label>
+                    <input type="text" id="surname" placeholder="Enter last name">
+                    <div class="error-msg">Surname is required.</div>
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group" id="grp-gender">
+                    <label for="gender">Gender <span class="required">*</span></label>
+                    <select id="gender">
+                        <option value="">-- Select Gender --</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                    <div class="error-msg">Please select a gender.</div>
+                </div>
+
+                <!-- Birthdate -->
+                <div class="form-group" id="grp-birthdate">
+                    <label for="birthdate">Birthdate <span class="required">*</span></label>
+                    <input type="date" id="birthdate" placeholder="Select date" readonly>
+                    <div class="error-msg">Birthdate is required.</div>
+                </div>
+
+                <!-- Work Address -->
+                <div class="form-group" id="grp-workaddress">
+                    <label for="workAddress">Work Address</label>
+                    <textarea id="workAddress" placeholder="Enter work address (optional)"></textarea>
+                </div>
+
+                <!-- Home Address -->
+                <div class="form-group" id="grp-homeaddress">
+                    <label for="homeAddress">Home Address</label>
+                    <textarea id="homeAddress" placeholder="Enter home address (optional)"></textarea>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-goto="home">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ====== DISPLAY VIEW ====== -->
+    <div id="view-display" class="page-view">
+        <div class="display-header">
+            <h2>Registered Users</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by name or surname...">
+            </div>
+        </div>
+        <div id="usersContainer"></div>
+    </div>
 </div>
 
-<!-- Register User Section -->
-<div id="registerSection" class="section">
-    <h2>Register User</h2>
-    <input type="text" id="name" placeholder="Enter Name"><br>
-    <input type="text" id="surname" placeholder="Enter Surname"><br>
-
-    <label for="gender">Choose your gender:</label>
-
-    <select name="genders" id="gender">
-        <option value="female">Female</option>
-        <option value="male">Male</option>
-    </select><br>
-
-    <input type="text" id="birthdate" placeholder="Enter your date of birth"><br>
-
-    <label for="workAddress">Enter your work address</label><br>
-    <textarea id="workAddress" maxlength="125"></textarea><br>
-
-    <label for="homeAddress">Enter your home address</label><br>
-    <textarea id="homeAddress" maxlength="125"></textarea><br>
-    <button onclick="registerUser()">Save</button>
-    <p id="message"></p>
+<!-- ====== USER DETAIL MODAL ====== -->
+<div id="detailModal" class="modal-overlay">
+    <div class="modal">
+        <button class="close-btn" onclick="App.closeModal()">&times;</button>
+        <h3>User Details</h3>
+        <div id="detailContent"></div>
+        <div class="modal-actions">
+            <button class="btn btn-danger" id="btnDeleteUser">🗑 Delete</button>
+            <button class="btn btn-secondary" onclick="App.closeModal()">Close</button>
+        </div>
+    </div>
 </div>
 
-<!-- Display Users Section -->
-<div id="usersSection" class="section">
-    <h2>All Users</h2>
-    <ul id="userList"></ul>
+<!-- ====== CONFIRM DIALOG ====== -->
+<div id="confirmDialog" class="confirm-overlay">
+    <div class="confirm-dialog">
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+        <div class="confirm-actions">
+            <button class="btn btn-secondary" onclick="App.closeConfirm()">Cancel</button>
+            <button class="btn btn-danger" id="btnConfirmDelete">Delete</button>
+        </div>
+    </div>
 </div>
-
 <script>
-    const users = [];
+ $(function () {
 
-    function showRegister() {
-    document.getElementById("registerSection").style.display = "block";
-    document.getElementById("usersSection").style.display = "none";
-    }
+    const DataLayer={
+        _users: [],
+        _nextId:1,
 
-    function showUsers() {
-        document.getElementById("registerSection").style.display = "none";
-        document.getElementById("usersSection").style.display = "block";
+        // helper functions
+        _load: function(){
+        },
+        _save: function(){
+        },
 
-        fetch('/homepage/display')
-            .then(response => response.json())
-            .then(users => {
-                const userList = document.getElementById("userList");
-                userList.innerHTML = "";
-
-                if (users.length === 0) {
-                    userList.innerHTML = "<li>No users registered.</li>";
-                    return;
-                }
-
-                users.forEach(user => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `
-                        <strong>${user.name} ${user.surname}</strong><br>
-                        Gender: ${user.gender}<br>
-                        Birthdate: ${user.birthdate}<br>
-                        Work Address: ${user.workAddress}<br>
-                        Home Address: ${user.homeAddress}
-                    `;
-                    userList.appendChild(li);
-                });
-            })
-            .catch(err => {
-                document.getElementById("userList").innerHTML = "<li>Error loading users.</li>";
-            });
-    }
-
-    function registerUser() {
-    const name = document.getElementById("name").value.trim();
-    const surname = document.getElementById("surname").value.trim();
-    const gender = document.getElementById("gender").value.trim();
-    const birthdate = document.getElementById("birthdate").value.trim();
-    const workAddress = document.getElementById("workAddress").value.trim();
-    const homeAddress = document.getElementById("homeAddress").value.trim();
-
-    if (!name) {
-    document.getElementById("message").textContent =
-    "Please enter your name.";
-    return;
-    }
-
-    if (!surname) {
-    document.getElementById("message").textContent =
-    "Please enter your surname.";
-    return;
-    }
-
-    if (!gender) {
-    document.getElementById("message").textContent =
-    "Please enter your gender";
-    return;
-    }
-
-    if (!birthdate) {
-    document.getElementById("message").textContent =
-    "Please enter your date of birth";
-    return;
-    }
-
-    const user = {name, surname, gender, birthdate, workAddress, homeAddress};
-
-    users.push({ name, surname, gender, birthdate, workAddress, homeAddress });
-
-    fetch('/homepage/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
-    })
-    .then(response => {
-        if (response.ok) {
-            document.getElementById("message").textContent = "User registered successfully.";
-            document.getElementById("name").value = "";
-            document.getElementById("surname").value = "";
-            document.getElementById("gender").value = "";
-            document.getElementById("birthdate").value = "";
-            document.getElementById("workAddress").value = "";
-            document.getElementById("homeAddress").value = "";
-        } else {
-            document.getElementById("message").textContent = "Registration failed.";
+        // api methods
+        getUsers: function(){
+        },
+        registerUser: function(){
+        },
+        deleteUser: function(){
+        },
+        getUserById: function(){
         }
-    })
-    .catch(err => {
-        document.getElementById("message").textContent = "Error: " + err.message;
-    });
-    }
-</script>
+    };
 
+    // initializing
+    DataLayer._load();
+
+    const App={}
+
+     // navigation
+     function navigate(page) {
+         // Update nav buttons
+         $('.nav-links button').removeClass('active');
+         $('[data-page="' + page + '"]').addClass('active');
+
+         // Show/hide views
+         $('.page-view').removeClass('active');
+         $('#view-' + page).addClass('active');
+
+         // Reset form when entering register page
+         if (page === 'register') {
+             $('#userForm')[0].reset();
+             $('.form-group').removeClass('has-error');
+         }
+
+         // Refresh list when entering display page
+         if (page === 'display') {
+             renderUsers();
+         }
+     }
+
+     // ---------- Routing via URL hash (#home, #register, #display) ----------
+     function route() {
+         const page = (window.location.hash.replace('#', '') || 'home');
+         const valid = ['home', 'register', 'display'];
+         navigate(valid.indexOf(page) !== -1 ? page : 'home');
+     }
+
+     $(window).on('hashchange', route);
+
+     // ---------- Event bindings ----------
+     $('.nav-links button').on('click', function () {
+         window.location.hash = $(this).data('page');   // triggers hashchange → route()
+     });
+
+     $('.brand').on('click', function () {
+         window.location.hash = 'home';
+     });
+
+     $('.action-card').on('click', function () {
+         const page = $(this).data('page');
+         if (page) window.location.hash = page;
+     });
+
+     // Cancel buttons inside pages
+     $('.btn-secondary[data-goto]').on('click', function () {
+         window.location.hash = $(this).data('goto');
+     });
+
+     // ---------- Initial load ----------
+     route();
+
+ });
+</script>
 </body>
 </html>
