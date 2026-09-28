@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './Home';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import UserList from './UserList';
 import UserEdit from "./UserEdit";
 
@@ -9,14 +9,13 @@ class App extends Component {
   render() {
     return (
         <Router>
-          <Switch>
-            <Route path='/users' exact={true} component={Home}/>
-            <Route path='/users/display' exact={true} component={UserList}/>
-            <Route path='/users/update/:id' component={UserEdit}/>
-          </Switch>
+          <Routes>
+            <Route path='/' element={<Home/>}/>
+            <Route path='/display-users' element={<UserList />}/>
+            <Route path='/update-user/:id' element={<UserEdit />}/>
+          </Routes>
         </Router>
     )
   }
 }
-
 export default App;

@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/")
 public class UserController {
 
     @Autowired
@@ -20,7 +20,7 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/display")
+    @GetMapping("/display-users")
     public List<User> getAllUsers() {
         // This returns a JSON or XML with the users
         return userRepository.findAll();
@@ -32,13 +32,13 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    @PostMapping("/register")
+    @PostMapping("/register-user")
     public ResponseEntity<User> registerNewUser(@RequestBody User user)throws URISyntaxException{
         User savedUser = userRepository.save(user);
         return ResponseEntity.created(new URI("/users/" + savedUser.getId())).body(savedUser);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update-user/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User client) {
         User currentUser = userRepository.findById(id).orElseThrow(RuntimeException::new);
         currentUser.setName(client.getName());
@@ -52,7 +52,7 @@ public class UserController {
         return ResponseEntity.ok(currentUser);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete-user/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);
         return ResponseEntity.ok().build();
