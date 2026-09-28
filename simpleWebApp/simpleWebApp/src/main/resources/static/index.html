@@ -594,12 +594,12 @@
             <h1>Welcome to User Manager</h1>
             <p>Register new users or browse the existing user database.</p>
             <div class="action-cards">
-                <div class="action-card" data-page="display" onclick="App.navigate('display')">
+                <div class="action-card" data-page="display" onclick="navigate('display')">
                     <div class="card-icon">👥</div>
                     <h3>Display Users</h3>
                     <p>Browse, search, and view detailed information about registered users.</p>
                 </div>
-                <div class="action-card" data-page="register" onclick="App.navigate('register')">
+                <div class="action-card" data-page="register" onclick="navigate('register')">
                     <div class="card-icon">➕</div>
                     <h3>Register New User</h3>
                     <p>Fill in the form below to add a new user to the system.</p>
@@ -641,18 +641,18 @@
                 <!-- Birthdate -->
                 <div class="form-group" id="grp-birthdate">
                     <label for="birthdate">Birthdate <span class="required">*</span></label>
-                    <input type="date" id="birthdate" placeholder="Select date" readonly>
+                    <input type="text" id="birthdate" placeholder="Select date" readonly>
                     <div class="error-msg">Birthdate is required.</div>
                 </div>
 
                 <!-- Work Address -->
-                <div class="form-group" id="grp-workaddress">
+                <div class="form-group" id="grp-workAddress">
                     <label for="workAddress">Work Address</label>
                     <textarea id="workAddress" placeholder="Enter work address (optional)"></textarea>
                 </div>
 
                 <!-- Home Address -->
-                <div class="form-group" id="grp-homeaddress">
+                <div class="form-group" id="grp-homeAddress">
                     <label for="homeAddress">Home Address</label>
                     <textarea id="homeAddress" placeholder="Enter home address (optional)"></textarea>
                 </div>
@@ -660,7 +660,7 @@
                 <!-- Actions -->
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" data-goto="home">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save User</button>
+                    <button type="submit" class="btn btn-primary" onclick="registerUser()">Save User</button>
                 </div>
             </form>
         </div>
@@ -671,7 +671,7 @@
         <div class="display-header">
             <h2>Registered Users</h2>
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search by name or surname...">
+                <label for="searchInput"></label><input type="text" id="searchInput" placeholder="Search by name or surname...">
             </div>
         </div>
         <div id="usersContainer"></div>
@@ -703,88 +703,118 @@
     </div>
 </div>
 <script>
- $(function () {
+    var isNew = true;
+    var userId = null;
 
-    const DataLayer={
-        _users: [],
-        _nextId:1,
+    function registerUser(){
+        if($("#userForm").valid()){
+            var url = "";
+            var data = "";
 
-        // helper functions
-        _load: function(){
-        },
-        _save: function(){
-        },
+            if(isNew == true){
+                url = '[[${environment.getProperty('api.base.path')}}]]/homepage/register';
+                data = $("#userForm").serialize();
+            }
 
-        // api methods
-        getUsers: function(){
-        },
-        registerUser: function(){
-        },
-        deleteUser: function(){
-        },
-        getUserById: function(){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: "JSON",
+                data: data,
+                success:function(data){
+                    $('#name').val("");
+                    $('#surname').val("");
+                    $('#gender').val("");
+                    $('#birthdate').val("");
+                    $('#workAddress').val("");
+                    $('#homeAddress').val("");
+                    console.log(data);
+
+                    if(data.status == "success"){
+                        alert("User registered successfully!");
+                    } else {
+                        alert("User data updated!");
+                    }
+                }
+            })
         }
-    };
+    }
 
-    // initializing
-    DataLayer._load();
+    function displayUsers(){
+        $.ajax({
+            type: method,
+            url: url,
+            dataType: "JSON",
+            success:function(data){
+                const container = $('#usersContainer');
+                const query = ($('#searchInput').val() || '').trim().toLowerCase();
+            }
+        })
+    }
 
-    const App={}
+    function getUserDetails(){
 
-     // navigation
-     function navigate(page) {
-         // Update nav buttons
-         $('.nav-links button').removeClass('active');
-         $('[data-page="' + page + '"]').addClass('active');
+    }
 
-         // Show/hide views
-         $('.page-view').removeClass('active');
-         $('#view-' + page).addClass('active');
+    function deleteUser(){
+        $.ajax({
 
-         // Reset form when entering register page
-         if (page === 'register') {
-             $('#userForm')[0].reset();
-             $('.form-group').removeClass('has-error');
-         }
+        })
+    }
+</script>
+<script>
+    // ---------- Navigation ----------
+    function navigate(page) {
+        // Update nav buttons
+        $('.nav-links button').removeClass('active');
+        $('[data-page="' + page + '"]').addClass('active');
 
-         // Refresh list when entering display page
-         if (page === 'display') {
-             renderUsers();
-         }
-     }
+        // Show/hide views
+        $('.page-view').removeClass('active');
+        $('#view-' + page).addClass('active');
 
-     // ---------- Routing via URL hash (#home, #register, #display) ----------
-     function route() {
-         const page = (window.location.hash.replace('#', '') || 'home');
-         const valid = ['home', 'register', 'display'];
-         navigate(valid.indexOf(page) !== -1 ? page : 'home');
-     }
+        // Reset form when entering register page
+        if (page === 'register') {
+            $('#userForm')[0].reset();
+            $('.form-group').removeClass('has-error');
+        }
 
-     $(window).on('hashchange', route);
+        // Refresh list when entering display page
+        if (page === 'display') {
+            renderUsers();
+        }
+    }
 
-     // ---------- Event bindings ----------
-     $('.nav-links button').on('click', function () {
-         window.location.hash = $(this).data('page');   // triggers hashchange → route()
-     });
+    // ---------- Routing via URL hash (#home, #register, #display) ----------
+    function route() {
+        const page = (window.location.hash.replace('#', '') || 'home');
+        const valid = ['home', 'register', 'display'];
+        navigate(valid.indexOf(page) !== -1 ? page : 'home');
+    }
 
-     $('.brand').on('click', function () {
-         window.location.hash = 'home';
-     });
+    $(window).on('hashchange', route);
 
-     $('.action-card').on('click', function () {
-         const page = $(this).data('page');
-         if (page) window.location.hash = page;
-     });
+    // ---------- Event bindings ----------
+    $('.nav-links button').on('click', function () {
+        window.location.hash = $(this).data('page');   // triggers hashchange → route()
+    });
 
-     // Cancel buttons inside pages
-     $('.btn-secondary[data-goto]').on('click', function () {
-         window.location.hash = $(this).data('goto');
-     });
+    $('.brand').on('click', function () {
+        window.location.hash = 'home';
+    });
 
-     // ---------- Initial load ----------
-     route();
+    $('.action-card').on('click', function () {
+        const page = $(this).data('page');
+        if (page) window.location.hash = page;
+    });
 
- });
+    // Cancel buttons inside pages
+    $('.btn-secondary[data-goto]').on('click', function () {
+        window.location.hash = $(this).data('goto');
+    });
+
+    // ---------- Initial load ----------
+    route();
 </script>
 </body>
 </html>

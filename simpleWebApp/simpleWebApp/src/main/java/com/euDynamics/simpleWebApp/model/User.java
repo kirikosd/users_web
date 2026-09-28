@@ -9,7 +9,7 @@ public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name="id")
-    private Integer id;
+    private Long id;
 
     @Column(name="name")
     private String name;
@@ -46,6 +46,10 @@ public class User {
         this.workAddress = workAddress;
         this.homeAddress = homeAddress;
     }
+
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 
     public String getName() {
         return name;

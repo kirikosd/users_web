@@ -3,38 +3,58 @@ package com.euDynamics.simpleWebApp.controller;
 import com.euDynamics.simpleWebApp.model.User;
 import com.euDynamics.simpleWebApp.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 
-@Controller
-@RequestMapping("/homepage")
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @PostMapping("/register")
-    public @ResponseBody String registerNewUser(@RequestBody User user){
-        userRepository.save(user);
-        return "Successful Registration!";
+    public UserController(UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/display")
+    public List<User> getAllUsers() {
+        // This returns a JSON or XML with the users
+        return userRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Integer id) {
+    public User getUserById(@PathVariable Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
-        userRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/register")
+    public ResponseEntity<User> registerNewUser(@RequestBody User user)throws URISyntaxException{
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.created(new URI("/users/" + savedUser.getId())).body(savedUser);
     }
 
-    @GetMapping("/display")
-    public @ResponseBody Iterable<User> getAllUsers() {
-        // This returns a JSON or XML with the users
-        return userRepository.findAll();
+    @PutMapping("/update/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User client) {
+        User currentUser = userRepository.findById(id).orElseThrow(RuntimeException::new);
+        currentUser.setName(client.getName());
+        currentUser.setSurname(client.getSurname());
+        currentUser.setGender(client.getGender());
+        currentUser.setBirthdate(client.getBirthdate());
+        currentUser.setWorkAddress(client.getWorkAddress());
+        currentUser.setHomeAddress(client.getHomeAddress());
+        currentUser = userRepository.save(client);
+
+        return ResponseEntity.ok(currentUser);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }
