@@ -17,4 +17,4 @@ class UserList extends Component {
             .then(data => this.setState({users: data}));
     }
 }
-export default UsersList;
+export default UserList;
