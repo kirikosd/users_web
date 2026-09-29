@@ -11,6 +11,7 @@ function App() {
             <Route path='/' element={<Home/>}/>
             <Route path='/display-users' element={<UserList/>}/>
             <Route path='/update-user/:id' element={<UserEdit/>}/>
+            <Route path='/register-user' element={<UserEdit/>}/>
           </Routes>
         </Router>
     );

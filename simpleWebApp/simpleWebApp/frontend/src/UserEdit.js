@@ -19,15 +19,15 @@ function UserEdit() {
     const [item, setItem] = useState(emptyItem);
 
     useEffect(() => {
-            if (id !== 'register-user') {
-                const fetchUser = async () => {
-                    const response = await fetch(`/user/${id}`);
-                    const user = await response.json();
-                    setItem(user);
-                };
-                fetchUser();
-            }
-        }, [id]);
+        if (id !== 'register-user') {
+            const fetchUser = async () => {
+                const response = await fetch(`/user/${id}`);
+                const user = await response.json();
+                setItem(user);
+            };
+            fetchUser();
+        }
+    }, [id]);
 
     const handleChange = (event) => {
         const target = event.target;
@@ -41,15 +41,29 @@ function UserEdit() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        await fetch('/display-users' + (item.id ? '/' + item.id : ''), {
-            method: item.id ? 'PUT' : 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(item),
-        });
-        nav('/display-users');
+
+        const url = item.id ? `/update-user/${item.id}` : '/register-user';
+        const method = item.id ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(item),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+            }
+
+            nav('/display-users');
+        } catch(error) {
+            console.error('Save failed:', error);
+            alert('Failed to save user');
+        }
     };
 
     const title = <h2>{item.id ? 'Edit User' : 'Register User'}</h2>;
@@ -92,7 +106,7 @@ function UserEdit() {
                     </FormGroup>
                     <FormGroup>
                         <Button color="primary" type="submit">Save</Button>{' '}
-                        <Button color="secondary" tag={Link} to="/users">Cancel</Button>
+                        <Button color="secondary" tag={Link} to="/">Cancel</Button>
                     </FormGroup>
                 </Form>
             </Container>
