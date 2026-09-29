@@ -1,24 +1,24 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button, ButtonGroup, Container, Table } from 'reactstrap';
 import AppNavbar from './AppNavbar';
-import { Link } from 'react-router-dom';
 
-class UserList extends Component {
+function UserList() {
+    const [users, setUsers] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    constructor(props) {
-        super(props);
-        this.state = {users: [], isLoading:false};
-        this.remove = this.remove.bind(this);
-    }
-
-    componentDidMount() {
+    useEffect(() => {
         fetch('/display-users')
-                    .then(response => response.json())
-                    .then(data => this.setState({ users: data, isLoading: false }))
-                    .catch(error => console.error('Error fetching users:', error));
-    }
+            .then(response => response.json())
+            .then(data => {
+                console.log('API response:', data);
+                setUsers(data);
+                setIsLoading(false);
+            })
+            .catch(error => console.error('Error fetching users:', error));
+    }, []);
 
-    async remove(id) {
+    async function remove(id) {
         await fetch(`/delete-user/${id}`, {
             method: 'DELETE',
             headers: {
@@ -26,20 +26,17 @@ class UserList extends Component {
                 'Content-Type': 'application/json'
             }
         }).then(() => {
-            let updatedUsers = [...this.state.users].filter(i => i.id !== id);
-            this.setState({users: updatedUsers});
+            setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
         });
     }
 
-    render() {
-        const {users, isLoading} = this.state;
+    if (isLoading) {
+        return <p>Loading...</p>;
+    }
 
-        if (isLoading) {
-            return <p>Loading...</p>;
-        }
-
-        const usersList = users.map(user => {
-            return <tr key={user.id}>
+    const usersList = users.map(user => {
+        return (
+            <tr key={user.id}>
                 <td style={{whiteSpace: 'nowrap'}}>{user.name}</td>
                 <td style={{whiteSpace: 'nowrap'}}>{user.surname}</td>
                 <td>{user.gender}</td>
@@ -48,40 +45,40 @@ class UserList extends Component {
                 <td>{user.homeAddress}</td>
                 <td>
                     <ButtonGroup>
-                        <Button size="sm" color="primary" tag={Link} to={"/users/update" + user.id}>Edit</Button>
-                        <Button size="sm" color="danger" onClick={() => this.remove(user.id)}>Delete</Button>
+                        <Button size="sm" color="primary" tag={Link} to={`/update-user/${user.id}`}>Edit</Button>
+                        <Button size="sm" color="danger" onClick={() => remove(user.id)}>Delete</Button>
                     </ButtonGroup>
                 </td>
             </tr>
-        });
-
-        return (
-            <div>
-                <AppNavbar/>
-                <Container fluid>
-                    <div className="float-right">
-                        <Button color="success" tag={Link} to="/register-user">Add User</Button>
-                    </div>
-                    <h3>Users</h3>
-                    <Table className="mt-4">
-                        <thead>
-                        <tr>
-                            <th width="15%">Name</th>
-                            <th width="15%">Surname</th>
-                            <th width="15%">Gender</th>
-                            <th width="15%">Birthdate</th>
-                            <th width="15%">Work Address</th>
-                            <th width="15%">Home Address</th>
-                            <th width="10%">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {usersList}
-                        </tbody>
-                    </Table>
-                </Container>
-            </div>
         );
-    }
+    });
+
+    return (
+        <div>
+            <AppNavbar/>
+            <Container fluid>
+                <h3>Users</h3>
+                <Table className="mt-4">
+                    <thead>
+                    <tr>
+                        <th width="15%">Name</th>
+                        <th width="15%">Surname</th>
+                        <th width="15%">Gender</th>
+                        <th width="15%">Birthdate</th>
+                        <th width="15%">Work Address</th>
+                        <th width="15%">Home Address</th>
+                        <th width="10%">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {usersList}
+                    </tbody>
+                </Table>
+                <div className="float-right">
+                    <Button color="success" tag={Link} to="/register-user">Add User</Button>
+                </div>
+            </Container>
+        </div>
+    );
 }
 export default UserList;

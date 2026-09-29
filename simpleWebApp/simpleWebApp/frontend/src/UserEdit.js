@@ -1,97 +1,94 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Button, Container, Form, FormGroup, Input, Label } from 'reactstrap';
 import AppNavbar from './AppNavbar';
 
-class UserEdit extends Component {
+function UserEdit() {
+    const {id} = useParams();
+    const nav = useNavigate();
 
-    emptyItem = {
+    const emptyItem = {
         name: '',
         surname: '',
         gender: '',
         birthdate: '',
         workAddress: '',
         homeAddress: ''
-    };
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            item: this.emptyItem
-        };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    async componentDidMount() {
-        if (this.props.match.params.id !== 'register-user') {
-            const user = await (await fetch(`/users/${this.props.match.params.id}`)).json();
-            this.setState({item: user});
-        }
-    }
+    const [item, setItem] = useState(emptyItem);
 
-    handleChange(event) {
+    useEffect(() => {
+            if (id !== 'register-user') {
+                const fetchUser = async () => {
+                    const response = await fetch(`/user/${id}`);
+                    const user = await response.json();
+                    setItem(user);
+                };
+                fetchUser();
+            }
+        }, [id]);
+
+    const handleChange = (event) => {
         const target = event.target;
         const value = target.value;
         const name = target.name;
-        let item = {...this.state.item};
-        item[name] = value;
-        this.setState({item});
-    }
+        setItem(prevItem => ({
+            ...prevItem,
+            [name]: value
+        }));
+    };
 
-    async handleSubmit(event) {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        const {item} = this.state;
-
         await fetch('/display-users' + (item.id ? '/' + item.id : ''), {
-            method: (item.id) ? 'PUT' : 'POST',
+            method: item.id ? 'PUT' : 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(item),
         });
-        this.props.history.push('/display-users');
-    }
+        nav('/display-users');
+    };
 
-    render() {
-        const {item} = this.state;
-        const title = <h2>{item.id ? 'Edit User' : 'Register User'}</h2>;
+    const title = <h2>{item.id ? 'Edit User' : 'Register User'}</h2>;
 
-        return <div>
+    return (
+        <div>
             <AppNavbar/>
             <Container>
                 {title}
-                <Form onSubmit={this.handleSubmit}>
+                <Form onSubmit={handleSubmit}>
                     <FormGroup>
                         <Label for="name">Name</Label>
                         <Input type="text" name="name" id="name" value={item.name || ''}
-                               onChange={this.handleChange} autoComplete="name"/>
+                               onChange={handleChange} autoComplete="name"/>
                     </FormGroup>
                     <FormGroup>
                         <Label for="surname">Surname</Label>
                         <Input type="text" name="surname" id="surname" value={item.surname || ''}
-                               onChange={this.handleChange} autoComplete="surname"/>
+                               onChange={handleChange} autoComplete="surname"/>
                     </FormGroup>
                     <FormGroup>
                         <Label for="gender">Gender</Label>
                         <Input type="text" name="gender" id="gender" value={item.gender || ''}
-                               onChange={this.handleChange} autoComplete="gender"/>
+                               onChange={handleChange} autoComplete="gender"/>
                     </FormGroup>
                     <FormGroup>
                         <Label for="birthdate">Date of Birth</Label>
                         <Input type="text" name="birthdate" id="birthdate" value={item.birthdate || ''}
-                               onChange={this.handleChange} autoComplete="birthdate"/>
+                               onChange={handleChange} autoComplete="birthdate"/>
                     </FormGroup>
                     <FormGroup>
                         <Label for="workAddress">Work Address</Label>
                         <Input type="text" name="workAddress" id="workAddress" value={item.workAddress || ''}
-                               onChange={this.handleChange} autoComplete="workAddress"/>
+                               onChange={handleChange} autoComplete="workAddress"/>
                     </FormGroup>
                     <FormGroup>
-                        <Label for="homeAddress">Surname</Label>
+                        <Label for="homeAddress">homeAddress</Label>
                         <Input type="text" name="homeAddress" id="homeAddress" value={item.homeAddress || ''}
-                               onChange={this.handleChange} autoComplete="homeAddress"/>
+                               onChange={handleChange} autoComplete="homeAddress"/>
                     </FormGroup>
                     <FormGroup>
                         <Button color="primary" type="submit">Save</Button>{' '}
@@ -100,6 +97,6 @@ class UserEdit extends Component {
                 </Form>
             </Container>
         </div>
-    }
+    );
 }
 export default UserEdit;
