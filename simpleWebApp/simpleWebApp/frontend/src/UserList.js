@@ -6,6 +6,7 @@ import AppNavbar from './AppNavbar';
 function UserList() {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
         fetch('/display-users')
@@ -34,22 +35,29 @@ function UserList() {
         return <p>Loading...</p>;
     }
 
+    const userDetails = ({user, remove}) => {
+        <div>
+            <div><span>Name:</span><span>{user.name}</span></div>
+            <div><span>Surname:</span><span>{user.surname}</span></div>
+            <div><span>Gender:</span><span>{user.gender}</span></div>
+            <div><span>Birthdate:</span><span>{user.birthdate}</span></div>
+            <div><span>Work address:</span><span>{user.workAddress}</span></div>
+            <div><span>Home address:</span><span>{user.homeAddress}</span></div>
+            <Button size="sm" color="primary" tag={Link} to={`/update-user/${user.id}`}>Edit</Button>
+            <Button size="sm" color="danger" onClick={() => remove(user.id)}>Delete</Button>
+        </div>
+    };
+
     const usersList = users.map(user => {
         return (
-            <tr key={user.id}>
-                <td style={{whiteSpace: 'nowrap'}}>{user.name}</td>
-                <td style={{whiteSpace: 'nowrap'}}>{user.surname}</td>
-                <td>{user.gender}</td>
-                <td>{user.birthdate}</td>
-                <td>{user.workAddress}</td>
-                <td>{user.homeAddress}</td>
-                <td>
-                    <ButtonGroup>
-                        <Button size="sm" color="primary" tag={Link} to={`/update-user/${user.id}`}>Edit</Button>
-                        <Button size="sm" color="danger" onClick={() => remove(user.id)}>Delete</Button>
-                    </ButtonGroup>
-                </td>
-            </tr>
+            <div>
+                <ul>
+                    <li key={user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', border: '1px solid #eee', borderRadius: '4px', marginBottom: '4px', width: '520px' }}>
+                        <span>{user.name} {user.surname}</span>
+                        <span onClick={() => setSelectedUser(user)}> ➕ </span>
+                    </li>
+                </ul>
+            </div>
         );
     });
 
@@ -57,24 +65,30 @@ function UserList() {
         <div>
             <AppNavbar/>
             <Container fluid>
-                <h3>Users</h3>
-                <Table className="mt-4">
-                    <thead>
-                    <tr>
-                        <th width="15%">Name</th>
-                        <th width="15%">Surname</th>
-                        <th width="15%">Gender</th>
-                        <th width="15%">Birthdate</th>
-                        <th width="15%">Work Address</th>
-                        <th width="15%">Home Address</th>
-                        <th width="10%">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                <div style={{height: '80vh', width: '40%', float: 'left', overflowY:'auto'}}>
+                    <h3>Users</h3>
                     {usersList}
-                    </tbody>
-                </Table>
-                <div className="float-right">
+                </div>
+                <div style={{ float: 'left', width: '60%' }}>
+                    <h3>User Details</h3>
+                    {selectedUser ? (
+                        <div>
+                            <div><span>Name:</span><span>{selectedUser.name}</span></div>
+                            <div><span>Surname:</span><span>{selectedUser.surname}</span></div>
+                            <div><span>Gender:</span><span>{selectedUser.gender}</span></div>
+                            <div><span>Birthdate:</span><span>{selectedUser.birthdate}</span></div>
+                            <div><span>Work address:</span><span>{selectedUser.workAddress}</span></div>
+                            <div><span>Home address:</span><span>{selectedUser.homeAddress}</span></div>
+                            <Button size="sm" color="primary" tag={Link}
+                                    to={`/update-user/${selectedUser.id}`}>Edit</Button>
+                            <Button size="sm" color="danger"
+                                    onClick={() => remove(selectedUser.id)}>Delete</Button>
+                        </div>
+                        ) : (
+                        <p>Select a user to see details</p>
+                    )}
+                </div>
+                <div style={{ clear: 'both' }}>
                     <Button color="success" tag={Link} to="/register-user">Add User</Button>
                 </div>
             </Container>

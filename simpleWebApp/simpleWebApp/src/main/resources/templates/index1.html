@@ -685,6 +685,7 @@
         <h3>User Details</h3>
         <div id="detailContent"></div>
         <div class="modal-actions">
+            <div class="detail-row"><span class="detail-label">Name:</span><span class="detail-value">' + App.escapeHtml(u.name) + '</span></div>
             <button class="btn btn-danger" id="btnDeleteUser">🗑 Delete</button>
             <button class="btn btn-secondary" onclick="App.closeModal()">Close</button>
         </div>
