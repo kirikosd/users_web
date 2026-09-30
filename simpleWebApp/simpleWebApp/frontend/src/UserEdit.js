@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Button, Container, Form, FormGroup, Input, Label } from 'reactstrap';
 import AppNavbar from './AppNavbar';
+import './App.css';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format, parseISO } from 'date-fns';
 
 function UserEdit() {
     const {id} = useParams();
@@ -57,6 +61,8 @@ function UserEdit() {
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+            } else {
+                alert("Successful ")
             }
 
             nav('/display-users');
@@ -75,32 +81,60 @@ function UserEdit() {
                 {title}
                 <Form onSubmit={handleSubmit}>
                     <FormGroup>
-                        <Label for="name">Name</Label>
+                        <Label for="name">Name*</Label>
                         <Input type="text" name="name" id="name" value={item.name || ''}
-                               onChange={handleChange} autoComplete="name"/>
+                               onChange={handleChange} autoComplete="name" required/>
                     </FormGroup>
                     <FormGroup>
-                        <Label for="surname">Surname</Label>
+                        <Label for="surname">Surname*</Label>
                         <Input type="text" name="surname" id="surname" value={item.surname || ''}
-                               onChange={handleChange} autoComplete="surname"/>
+                               onChange={handleChange} autoComplete="surname" required/>
                     </FormGroup>
                     <FormGroup>
-                        <Label for="gender">Gender</Label>
-                        <Input type="text" name="gender" id="gender" value={item.gender || ''}
-                               onChange={handleChange} autoComplete="gender"/>
+                        <Label for="gender">Gender*</Label>
+                        <br></br>
+                        <select
+                          name="gender"
+                          id="gender"
+                          value={item.gender || ''}
+                          onChange={handleChange}
+                          autoComplete="sex"
+                          required
+                        >
+                          <option value="" disabled>Select</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                        </select>
                     </FormGroup>
                     <FormGroup>
-                        <Label for="birthdate">Date of Birth</Label>
-                        <Input type="text" name="birthdate" id="birthdate" value={item.birthdate || ''}
-                               onChange={handleChange} autoComplete="birthdate"/>
+                        <Label for="birthdate">Date of Birth*</Label>
+                        <br></br>
+                        <DatePicker
+                          id="birthdate"
+                          name="birthdate"
+                          selected={item.birthdate ? parseISO(item.birthdate) : null}
+                          onChange={(date) =>
+                            handleChange({
+                              target: { name: 'birthdate', value: date ? format(date, 'yyyy-MM-dd') : '' }
+                            })
+                          }
+                          dateFormat="dd/MM/yyyy"
+                          showYearDropdown
+                          scrollableYearDropdown
+                          yearDropdownItemNumber={100}
+                          maxDate={new Date()}
+                          placeholderText="DD/MM/YYYY"
+                          autoComplete="bday"
+                          required
+                        />
                     </FormGroup>
                     <FormGroup>
-                        <Label for="workAddress">Work Address</Label>
+                        <Label for="workAddress">Work Address (optional)</Label>
                         <Input type="text" name="workAddress" id="workAddress" value={item.workAddress || ''}
                                onChange={handleChange} autoComplete="workAddress"/>
                     </FormGroup>
                     <FormGroup>
-                        <Label for="homeAddress">homeAddress</Label>
+                        <Label for="homeAddress">Home Address(optional)</Label>
                         <Input type="text" name="homeAddress" id="homeAddress" value={item.homeAddress || ''}
                                onChange={handleChange} autoComplete="homeAddress"/>
                     </FormGroup>

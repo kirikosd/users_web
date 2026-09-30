@@ -3,10 +3,10 @@ import {Link} from 'react-router-dom';
 
 function AppNavbar() {
     return(
-        <Navbar color="dark" dark expand="md">
+        <Navbar className="navbar-custom">
             <NavbarBrand tag={Link} to="/">Home</NavbarBrand>
-            <NavbarBrand tag={Link} to="/display-users">Users</NavbarBrand>
-            <NavbarBrand tag={Link} to="/register-user">Register</NavbarBrand>
+            <NavbarBrand className="nav-link-custom" tag={Link} to="/display-users">Users</NavbarBrand>
+            <NavbarBrand className="nav-link-custom" tag={Link} to="/register-user">Register</NavbarBrand>
         </Navbar>
     );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, ButtonGroup, Container, Table } from 'reactstrap';
 import AppNavbar from './AppNavbar';
+import './App.css';
 
 function UserList() {
     const [users, setUsers] = useState([]);
@@ -73,12 +74,12 @@ function UserList() {
                     <h3>User Details</h3>
                     {selectedUser ? (
                         <div>
-                            <div><span>Name:</span><span>{selectedUser.name}</span></div>
-                            <div><span>Surname:</span><span>{selectedUser.surname}</span></div>
-                            <div><span>Gender:</span><span>{selectedUser.gender}</span></div>
-                            <div><span>Birthdate:</span><span>{selectedUser.birthdate}</span></div>
-                            <div><span>Work address:</span><span>{selectedUser.workAddress}</span></div>
-                            <div><span>Home address:</span><span>{selectedUser.homeAddress}</span></div>
+                            <div><span>Name: </span><span>{selectedUser.name}</span></div>
+                            <div><span>Surname: </span><span>{selectedUser.surname}</span></div>
+                            <div><span>Gender: </span><span>{selectedUser.gender}</span></div>
+                            <div><span>Birthdate: </span><span>{selectedUser.birthdate}</span></div>
+                            <div><span>Work address: </span><span>{selectedUser.workAddress}</span></div>
+                            <div><span>Home address: </span><span>{selectedUser.homeAddress}</span></div>
                             <Button size="sm" color="primary" tag={Link}
                                     to={`/update-user/${selectedUser.id}`}>Edit</Button>
                             <Button size="sm" color="danger"
