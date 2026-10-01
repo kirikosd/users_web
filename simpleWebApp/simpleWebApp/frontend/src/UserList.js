@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-//import { Button, ButtonGroup, Container, Table } from 'reactstrap';
-import { Alert, Button, Container, Row, Col, Input, Spinner } from 'reactstrap';
+import { Button, Container, Row, Col, Spinner } from 'reactstrap';
 import AppNavbar from './AppNavbar';
 import './App.css';
 
@@ -43,28 +42,32 @@ function UserList() {
         return (
             <div>
             <AppNavbar/>
-            <p>Loading...</p>
+            <Container className="text-center py-5">
+                <Spinner color="primary" />
+                <p className="mt-2 text-muted">Loading users…</p>
+            </Container>
             </div>
         );
     }
 
     const usersList = users.map(user => {
         return (
-            <div>
-                <ul>
-                    <li key={user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', border: '1px solid #eee', borderRadius: '4px', marginBottom: '4px', width: '450px' }}>
-                        <span>{user.name} {user.surname}</span>
-                        <span onClick={() => setSelectedId(user.id)}> ⌞ ⌝ </span>
-                    </li>
-                </ul>
-            </div>
+            <ul>
+                <li key={user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', border: '1px solid #eee', borderRadius: '4px', marginBottom: '4px', width: '450px' }}>
+                    <button type="button"
+                    className={`user-row w-100 text-start btn btn-link text-decoration-none px-3 py-2 border rounded mb-1 ${user.id === selectedId ? 'active fw-bold' : ''}`}
+                        onClick={() => setSelectedId(user.id)}>
+                        {user.name} {user.surname}
+                    </button>
+                </li>
+            </ul>
         );
     });
 
     return (
         <div>
             <AppNavbar/>
-            <Container fluid>
+            <Container fluid className="py-3">
                 <Row>
                     <Col md="4" className="border-end" style={{maxHeight: '70vh', overflowY: 'auto'}}>
                         <h3>Users</h3>
@@ -74,12 +77,12 @@ function UserList() {
                         <h3>User Details</h3>
                         {selectedUser ? (
                             <div>
-                                <div><span>Name: </span><span>{selectedUser.name}</span></div>
-                                <div><span>Surname: </span><span>{selectedUser.surname}</span></div>
-                                <div><span>Gender: </span><span>{selectedUser.gender}</span></div>
-                                <div><span>Birthdate: </span><span>{selectedUser.birthdate}</span></div>
-                                <div><span>Work address: </span><span>{selectedUser.workAddress}</span></div>
-                                <div><span>Home address: </span><span>{selectedUser.homeAddress}</span></div>
+                                <div>Name: {selectedUser.name}</div>
+                                <div>Surname: {selectedUser.surname}</div>
+                                <div>Gender: {selectedUser.gender}</div>
+                                <div>Birthdate: {selectedUser.birthdate}</div>
+                                <div>Work address: {selectedUser.workAddress}</div>
+                                <div>Home address: {selectedUser.homeAddress}</div>
                                 <Button size="sm" color="primary" tag={Link}
                                         to={`/update-user/${selectedUser.id}`}>Edit</Button>
                                 <Button size="sm" color="danger"
