@@ -23,14 +23,14 @@ public class User {
     @Column(name="birthdate")
     private String birthdate;
 
-    @Column(name="workAddress")
-    private String workAddress;
+//    @Column(name="workAddress")
+//    private String workAddress;
+//
+//    @Column(name="homeAddress")
+//    private String homeAddress;
 
-    @Column(name="homeAddress")
-    private String homeAddress;
-
-//    @OneToOne(mappedBy = "user", cascade=CascadeType.ALL, orphanRemoval = true)
-//    private Addresses addresses;
+    @OneToOne(mappedBy = "user", cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Addresses addresses;
 
     public User(){} //default constructor
 
@@ -40,7 +40,8 @@ public class User {
         this.gender = gender;
         this.birthdate = birthdate;
 
-        //this.addresses =  new Addresses(this, "","");
+        this.addresses =  new Addresses();
+        this.addresses.setUser(this);
     }
 
     public User(String name, String surname, String gender, String birthdate, String homeAddress, String workAddress){
@@ -48,10 +49,10 @@ public class User {
         this.surname = surname;
         this.gender = gender;
         this.birthdate = birthdate;
-        this.homeAddress = homeAddress;
-        this.workAddress = workAddress;
+//        this.homeAddress = homeAddress;
+//        this.workAddress = workAddress;
 
-        //this.addresses =  new Addresses(this, homeAddress,workAddress);
+        this.addresses =  new Addresses(this, homeAddress,workAddress);
     }
 
     public Long getId() { return id; }
@@ -90,35 +91,43 @@ public class User {
         this.birthdate = birthdate;
     }
 
-    public String getWorkAddress() {
-        return workAddress;
-    }
-
-    public void setWorkAddress(String workAddress) {
-        this.workAddress = workAddress;
-    }
-
-    public String getHomeAddress() {
-        return homeAddress;
-    }
-
-    public void setHomeAddress(String homeAddress) {
-        this.homeAddress = homeAddress;
-    }
-
 //    public String getWorkAddress() {
-//        return addresses.getWork_address();
+//        return workAddress;
 //    }
 //
 //    public void setWorkAddress(String workAddress) {
-//        addresses.setWork_address(workAddress);
+//        this.workAddress = workAddress;
 //    }
 //
 //    public String getHomeAddress() {
-//        return addresses.getHome_address();
+//        return homeAddress;
 //    }
 //
 //    public void setHomeAddress(String homeAddress) {
-//        addresses.setHome_address(homeAddress);
+//        this.homeAddress = homeAddress;
 //    }
+
+    public String getWorkAddress() {
+        return addresses != null ? addresses.getWork_address() : null;
+    }
+
+    public void setWorkAddress(String workAddress) {
+        if (this.addresses == null) {
+            this.addresses = new Addresses();
+            this.addresses.setUser(this);
+        }
+        this.addresses.setWork_address(workAddress);
+    }
+
+    public String getHomeAddress() {
+        return addresses != null ? addresses.getHome_address() : null;
+    }
+
+    public void setHomeAddress(String homeAddress) {
+        if (this.addresses == null) {
+            this.addresses = new Addresses();
+            this.addresses.setUser(this);
+        }
+        addresses.setHome_address(homeAddress);
+    }
 }
