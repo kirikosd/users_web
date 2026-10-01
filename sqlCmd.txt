@@ -1,0 +1,13 @@
+mvn spring-boot:run
+
+
+docker compose up --build -d
+docker compose ps          
+docker compose exec mysql sh
+
+mysql -u root -prootpassword123 simpleDatabase
+
+
+docker exec -i mysql-db mysql -uroot -p --default-character-set=utf8mb4 < backup.sql #databse restoring
+
+

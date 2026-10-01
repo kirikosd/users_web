@@ -1,10 +1,60 @@
 services:
   mysql:
     image: 'mysql:9'
+    container_name: simpleWebApp_db
+    restart: always
     environment:
-      - 'MYSQL_DATABASE=simpleDatabase'
-      - 'MYSQL_PASSWORD=password123'
-      - 'MYSQL_ROOT_PASSWORD=rootpassword123'
-      - 'MYSQL_USER=kirikos'
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword123}
+      MYSQL_DATABASE: ${DB_NAME:-simpleDatabase}
+      MYSQL_USER: ${DB_USER:-kirikos}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password123}
     ports:
       - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD:-rootpassword123}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  simplewebapp:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: simpleWebApp
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME:-simpleDatabase}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-kirikos}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-password123}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  react-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: react-app
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - simplewebapp
+    networks:
+      - app-network
+
+volumes:
+  mysql-data:
+
+networks:
+  app-network:
+    driver: bridge
