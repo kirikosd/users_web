@@ -2,12 +2,14 @@ package com.euDynamics.simpleWebApp.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name="users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="user_id")
     private Long id;
 
@@ -21,7 +23,7 @@ public class User {
     private String gender;
 
     @Column(name="birthdate")
-    private String birthdate;
+    private LocalDate birthdate;
 
 //    @Column(name="workAddress")
 //    private String workAddress;
@@ -30,21 +32,21 @@ public class User {
 //    private String homeAddress;
 
     @OneToOne(mappedBy = "user", cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Addresses addresses;
+    private Address addresses;
 
     public User(){} //default constructor
 
-    public User(String name, String surname, String gender, String birthdate){
+    public User(String name, String surname, String gender, LocalDate birthdate){
         this.name = name;
         this.surname = surname;
         this.gender = gender;
         this.birthdate = birthdate;
 
-        this.addresses =  new Addresses();
+        this.addresses =  new Address();
         this.addresses.setUser(this);
     }
 
-    public User(String name, String surname, String gender, String birthdate, String homeAddress, String workAddress){
+    public User(String name, String surname, String gender, LocalDate birthdate, String homeAddress, String workAddress){
         this.name = name;
         this.surname = surname;
         this.gender = gender;
@@ -52,7 +54,7 @@ public class User {
 //        this.homeAddress = homeAddress;
 //        this.workAddress = workAddress;
 
-        this.addresses =  new Addresses(this, homeAddress,workAddress);
+        this.addresses =  new Address(this, homeAddress,workAddress);
     }
 
     public Long getId() { return id; }
@@ -83,11 +85,11 @@ public class User {
         this.gender = gender;
     }
 
-    public String getBirthdate() {
+    public LocalDate getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(String birthdate) {
+    public void setBirthdate(LocalDate birthdate) {
         this.birthdate = birthdate;
     }
 
@@ -108,26 +110,26 @@ public class User {
 //    }
 
     public String getWorkAddress() {
-        return addresses != null ? addresses.getWork_address() : null;
+        return addresses != null ? addresses.getWorkAddress() : null;
     }
 
     public void setWorkAddress(String workAddress) {
         if (this.addresses == null) {
-            this.addresses = new Addresses();
+            this.addresses = new Address();
             this.addresses.setUser(this);
         }
-        this.addresses.setWork_address(workAddress);
+        this.addresses.setWorkAddress(workAddress);
     }
 
     public String getHomeAddress() {
-        return addresses != null ? addresses.getHome_address() : null;
+        return addresses != null ? addresses.getHomeAddress() : null;
     }
 
     public void setHomeAddress(String homeAddress) {
         if (this.addresses == null) {
-            this.addresses = new Addresses();
+            this.addresses = new Address();
             this.addresses.setUser(this);
         }
-        addresses.setHome_address(homeAddress);
+        addresses.setHomeAddress(homeAddress);
     }
 }
