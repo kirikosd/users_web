@@ -39,15 +39,15 @@ public class UserController {
     }
 
     @PutMapping("/update-user/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User client) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         User currentUser = userRepository.findById(id).orElseThrow(RuntimeException::new);
-        currentUser.setName(client.getName());
-        currentUser.setSurname(client.getSurname());
-        currentUser.setGender(client.getGender());
-        currentUser.setBirthdate(client.getBirthdate());
-        currentUser.setWorkAddress(client.getWorkAddress());
-        currentUser.setHomeAddress(client.getHomeAddress());
-        currentUser = userRepository.save(client);
+        currentUser.setName(user.getName());
+        currentUser.setSurname(user.getSurname());
+        currentUser.setGender(user.getGender());
+        currentUser.setBirthdate(user.getBirthdate());
+        currentUser.setWorkAddress(user.getWorkAddress());
+        currentUser.setHomeAddress(user.getHomeAddress());
+        currentUser = userRepository.save(user);
 
         return ResponseEntity.ok(currentUser);
     }

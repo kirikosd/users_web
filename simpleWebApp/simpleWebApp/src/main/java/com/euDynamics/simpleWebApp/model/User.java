@@ -8,7 +8,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    @Column(name="id")
+    @Column(name="user_id")
     private Long id;
 
     @Column(name="name")
@@ -23,28 +23,35 @@ public class User {
     @Column(name="birthdate")
     private String birthdate;
 
-    @Column(name="work_address")
+    @Column(name="workAddress")
     private String workAddress;
 
-    @Column(name="home_address")
+    @Column(name="homeAddress")
     private String homeAddress;
+
+//    @OneToOne(mappedBy = "user", cascade=CascadeType.ALL, orphanRemoval = true)
+//    private Addresses addresses;
 
     public User(){} //default constructor
 
-    public User(String name, String surname, String gender, String birthdate){ // mandatory parameters constructor
+    public User(String name, String surname, String gender, String birthdate){
         this.name = name;
         this.surname = surname;
         this.gender = gender;
         this.birthdate = birthdate;
+
+        //this.addresses =  new Addresses(this, "","");
     }
 
-    public User(String name, String surname, String gender, String birthdate, String workAddress, String homeAddress){ // all parameters constructor
+    public User(String name, String surname, String gender, String birthdate, String homeAddress, String workAddress){
         this.name = name;
         this.surname = surname;
         this.gender = gender;
         this.birthdate = birthdate;
-        this.workAddress = workAddress;
         this.homeAddress = homeAddress;
+        this.workAddress = workAddress;
+
+        //this.addresses =  new Addresses(this, homeAddress,workAddress);
     }
 
     public Long getId() { return id; }
@@ -98,4 +105,20 @@ public class User {
     public void setHomeAddress(String homeAddress) {
         this.homeAddress = homeAddress;
     }
+
+//    public String getWorkAddress() {
+//        return addresses.getWork_address();
+//    }
+//
+//    public void setWorkAddress(String workAddress) {
+//        addresses.setWork_address(workAddress);
+//    }
+//
+//    public String getHomeAddress() {
+//        return addresses.getHome_address();
+//    }
+//
+//    public void setHomeAddress(String homeAddress) {
+//        addresses.setHome_address(homeAddress);
+//    }
 }
