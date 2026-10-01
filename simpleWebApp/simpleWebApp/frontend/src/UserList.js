@@ -1,61 +1,60 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, ButtonGroup, Container, Table } from 'reactstrap';
+//import { Button, ButtonGroup, Container, Table } from 'reactstrap';
+import { Alert, Button, Container, Row, Col, Input, Spinner } from 'reactstrap';
 import AppNavbar from './AppNavbar';
 import './App.css';
 
 function UserList() {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedId, setSelectedId] = useState(null);
 
     useEffect(() => {
-        fetch('/display-users')
-            .then(response => response.json())
-            .then(data => {
-                console.log('API response:', data);
-                setUsers(data);
+        async function loadUsers(){
+            try{
+                const response = await fetch('/display-users');
+                if(!response.ok) throw new Error(`Server responded with ${response.status}`);
+                setUsers(await response.json());
                 setIsLoading(false);
-            })
-            .catch(error => console.error('Error fetching users:', error));
+            } catch {
+                alert('Could not load users.');
+            }
+        }
+        loadUsers();
     }, []);
 
     async function remove(id) {
-        await fetch(`/delete-user/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then(() => {
+        const confirmed = window.confirm(`Delete ${selectedUser.name} ${selectedUser.surname}? This cannot be undone.`);
+        if (!confirmed) return;
+
+        try{
+            const response = await fetch(`/delete-user/${id}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error(`Delete failed (${response.status})`);
             setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
-        });
+        } catch {
+            alert('Could not delete user.');
+        }
     }
+
+    const selectedUser = users.find(u => u.id === selectedId) ?? null;
 
     if (isLoading) {
-        return <p>Loading...</p>;
+        return (
+            <div>
+            <AppNavbar/>
+            <p>Loading...</p>
+            </div>
+        );
     }
-
-    const userDetails = ({user, remove}) => {
-        <div>
-            <div><span>Name:</span><span>{user.name}</span></div>
-            <div><span>Surname:</span><span>{user.surname}</span></div>
-            <div><span>Gender:</span><span>{user.gender}</span></div>
-            <div><span>Birthdate:</span><span>{user.birthdate}</span></div>
-            <div><span>Work address:</span><span>{user.workAddress}</span></div>
-            <div><span>Home address:</span><span>{user.homeAddress}</span></div>
-            <Button size="sm" color="primary" tag={Link} to={`/update-user/${user.id}`}>Edit</Button>
-            <Button size="sm" color="danger" onClick={() => remove(user.id)}>Delete</Button>
-        </div>
-    };
 
     const usersList = users.map(user => {
         return (
             <div>
                 <ul>
-                    <li key={user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', border: '1px solid #eee', borderRadius: '4px', marginBottom: '4px', width: '520px' }}>
+                    <li key={user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', border: '1px solid #eee', borderRadius: '4px', marginBottom: '4px', width: '450px' }}>
                         <span>{user.name} {user.surname}</span>
-                        <span onClick={() => setSelectedUser(user)}> ➕ </span>
+                        <span onClick={() => setSelectedId(user.id)}> ⌞ ⌝ </span>
                     </li>
                 </ul>
             </div>
@@ -66,32 +65,32 @@ function UserList() {
         <div>
             <AppNavbar/>
             <Container fluid>
-                <div style={{height: '80vh', width: '40%', float: 'left', overflowY:'auto'}}>
-                    <h3>Users</h3>
-                    {usersList}
-                </div>
-                <div style={{ float: 'left', width: '60%' }}>
-                    <h3>User Details</h3>
-                    {selectedUser ? (
-                        <div>
-                            <div><span>Name: </span><span>{selectedUser.name}</span></div>
-                            <div><span>Surname: </span><span>{selectedUser.surname}</span></div>
-                            <div><span>Gender: </span><span>{selectedUser.gender}</span></div>
-                            <div><span>Birthdate: </span><span>{selectedUser.birthdate}</span></div>
-                            <div><span>Work address: </span><span>{selectedUser.workAddress}</span></div>
-                            <div><span>Home address: </span><span>{selectedUser.homeAddress}</span></div>
-                            <Button size="sm" color="primary" tag={Link}
-                                    to={`/update-user/${selectedUser.id}`}>Edit</Button>
-                            <Button size="sm" color="danger"
-                                    onClick={() => remove(selectedUser.id)}>Delete</Button>
-                        </div>
-                        ) : (
-                        <p>Select a user to see details</p>
-                    )}
-                </div>
-                <div style={{ clear: 'both' }}>
-                    <Button color="success" tag={Link} to="/register-user">Add User</Button>
-                </div>
+                <Row>
+                    <Col md="4" className="border-end" style={{maxHeight: '70vh', overflowY: 'auto'}}>
+                        <h3>Users</h3>
+                        {usersList}
+                    </Col>
+                    <Col md="8">
+                        <h3>User Details</h3>
+                        {selectedUser ? (
+                            <div>
+                                <div><span>Name: </span><span>{selectedUser.name}</span></div>
+                                <div><span>Surname: </span><span>{selectedUser.surname}</span></div>
+                                <div><span>Gender: </span><span>{selectedUser.gender}</span></div>
+                                <div><span>Birthdate: </span><span>{selectedUser.birthdate}</span></div>
+                                <div><span>Work address: </span><span>{selectedUser.workAddress}</span></div>
+                                <div><span>Home address: </span><span>{selectedUser.homeAddress}</span></div>
+                                <Button size="sm" color="primary" tag={Link}
+                                        to={`/update-user/${selectedUser.id}`}>Edit</Button>
+                                <Button size="sm" color="danger"
+                                        onClick={() => remove(selectedUser.id)}>Delete</Button>
+                            </div>
+                            ) : (
+                            <p>Select a user to see details</p>
+                        )}
+                    </Col>
+                </Row>
+                <Button color="success" tag={Link} to="/register-user" className="mt-3">Add User</Button>
             </Container>
         </div>
     );

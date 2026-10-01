@@ -21,17 +21,19 @@ function UserEdit() {
     }
 
     const [item, setItem] = useState(emptyItem);
+    const isEdit = Boolean(id);
 
     useEffect(() => {
-        if (id !== 'register-user') {
+        if (isEdit) {
             const fetchUser = async () => {
                 const response = await fetch(`/user/${id}`);
-                const user = await response.json();
-                setItem(user);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                setItem(await response.json());
+
             };
             fetchUser();
         }
-    }, [id]);
+    }, [id, isEdit]);
 
     const handleChange = (event) => {
         const target = event.target;
@@ -46,8 +48,8 @@ function UserEdit() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const url = item.id ? `/update-user/${item.id}` : '/register-user';
-        const method = item.id ? 'PUT' : 'POST';
+        const url = isEdit ? `/update-user/${item.id}` : '/register-user';
+        const method = isEdit ? 'PUT' : 'POST';
 
         try {
             const response = await fetch(url, {
@@ -62,7 +64,7 @@ function UserEdit() {
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${await response.text()}`);
             } else {
-                alert("Successful ")
+                alert("Saved Successfully")
             }
 
             nav('/display-users');
@@ -93,7 +95,7 @@ function UserEdit() {
                     <FormGroup>
                         <Label for="gender">Gender*</Label>
                         <br></br>
-                        <select
+                        <Input type="select"
                           name="gender"
                           id="gender"
                           value={item.gender || ''}
@@ -104,7 +106,7 @@ function UserEdit() {
                           <option value="" disabled>Select</option>
                           <option value="male">Male</option>
                           <option value="female">Female</option>
-                        </select>
+                        </Input>
                     </FormGroup>
                     <FormGroup>
                         <Label for="birthdate">Date of Birth*</Label>
@@ -124,19 +126,18 @@ function UserEdit() {
                           yearDropdownItemNumber={100}
                           maxDate={new Date()}
                           placeholderText="DD/MM/YYYY"
-                          autoComplete="bday"
                           required
                         />
                     </FormGroup>
                     <FormGroup>
                         <Label for="workAddress">Work Address (optional)</Label>
                         <Input type="text" name="workAddress" id="workAddress" value={item.workAddress || ''}
-                               onChange={handleChange} autoComplete="workAddress"/>
+                               onChange={handleChange}/>
                     </FormGroup>
                     <FormGroup>
                         <Label for="homeAddress">Home Address(optional)</Label>
                         <Input type="text" name="homeAddress" id="homeAddress" value={item.homeAddress || ''}
-                               onChange={handleChange} autoComplete="homeAddress"/>
+                               onChange={handleChange}/>
                     </FormGroup>
                     <FormGroup>
                         <Button color="primary" type="submit">Save</Button>{' '}
