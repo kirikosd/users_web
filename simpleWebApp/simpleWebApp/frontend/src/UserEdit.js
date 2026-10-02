@@ -131,12 +131,12 @@ function UserEdit() {
                     </FormGroup>
                     <FormGroup>
                         <Label for="workAddress">Work Address (optional)</Label>
-                        <Input type="text" name="workAddress" id="workAddress" value={item.workAddress || ''}
+                        <Input type="textarea" maxlength="255" name="workAddress" id="workAddress" value={item.workAddress || ''}
                                onChange={handleChange}/>
                     </FormGroup>
                     <FormGroup>
                         <Label for="homeAddress">Home Address(optional)</Label>
-                        <Input type="text" name="homeAddress" id="homeAddress" value={item.homeAddress || ''}
+                        <Input type="textarea"  maxlength="255" name="homeAddress" id="homeAddress" value={item.homeAddress || ''}
                                onChange={handleChange}/>
                     </FormGroup>
                     <FormGroup>
