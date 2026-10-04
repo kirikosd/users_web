@@ -26,7 +26,7 @@ function UserEdit() {
     useEffect(() => {
         if (isEdit) {
             const fetchUser = async () => {
-                const response = await fetch(`/user/${id}`);
+                const response = await fetch(`/users/${id}`);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 setItem(await response.json());
 
@@ -48,8 +48,8 @@ function UserEdit() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const url = isEdit ? `/update-user/${item.id}` : '/register-user';
-        const method = isEdit ? 'PUT' : 'POST';
+        const url = isEdit ? `/users/${item.id}` : '/users';
+        const method = isEdit ? 'PATCH' : 'POST';
 
         try {
             const response = await fetch(url, {

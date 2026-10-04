@@ -12,7 +12,7 @@ function UserList() {
     useEffect(() => {
         async function loadUsers(){
             try{
-                const response = await fetch('/display-users');
+                const response = await fetch('/users');
                 if(!response.ok) throw new Error(`Server responded with ${response.status}`);
                 setUsers(await response.json());
                 setIsLoading(false);
@@ -28,7 +28,7 @@ function UserList() {
         if (!confirmed) return;
 
         try{
-            const response = await fetch(`/delete-user/${id}`, { method: 'DELETE' });
+            const response = await fetch(`/users/${id}`, { method: 'DELETE' });
             if (!response.ok) throw new Error(`Delete failed (${response.status})`);
             setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
         } catch {
