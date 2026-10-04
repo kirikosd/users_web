@@ -84,11 +84,11 @@ function UserEdit() {
                 <Form onSubmit={handleSubmit}>
                     <FormGroup>
                         <Label for="name">Name*</Label>
-                        <Input type="text" name="name" id="name" value={item.name || ''}
+                        <Input type="text" name="name" maxlength="255" id="name" value={item.name || ''}
                                onChange={handleChange} autoComplete="name" required/>
                     </FormGroup>
                     <FormGroup>
-                        <Label for="surname">Surname*</Label>
+                        <Label for="surname" maxlength="255">Surname*</Label>
                         <Input type="text" name="surname" id="surname" value={item.surname || ''}
                                onChange={handleChange} autoComplete="surname" required/>
                     </FormGroup>
