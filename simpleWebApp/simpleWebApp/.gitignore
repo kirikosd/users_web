@@ -1,8 +1,6 @@
 HELP.md
 target/
 node_modules/
-../Simple Web application-JS-Frontend.doc"
-../sqlCmd.txt
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
